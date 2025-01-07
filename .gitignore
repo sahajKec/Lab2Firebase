@@ -5,6 +5,8 @@ node_modules/
 # Build output
 build/
 
+dist/
+
 # System files
 .DS_Store
 Thumbs.db
