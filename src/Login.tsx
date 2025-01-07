@@ -1,64 +1,78 @@
-//Doing this on lab
-import React, { useState, ChangeEvent, useEffect } from 'react';
-import { auth } from './firebase';
-import {
-  signInWithEmailAndPassword,
-} from "firebase/auth";
-import 'bootstrap/dist/css/bootstrap.min.css';
-import { useNavigate } from 'react-router-dom';
+import React, { useState, ChangeEvent, useEffect } from "react";
+import { auth } from "./firebase/firebase";
+import { useNavigate } from "react-router-dom";
+import { signInWithEmailAndPassword } from "firebase/auth";
+import "bootstrap/dist/css/bootstrap.min.css";
+import { getFirestore, doc, getDoc } from "firebase/firestore";
 
-interface LoginProps {  }
+const Login: React.FC = () => {
+  const [email, setEmail] = useState<string>("");
+  const [password, setPassword] = useState<string>("");
+  const [loading, setLoading] = useState<boolean>(false);
+  const [error, setError] = useState<string>("");
 
-
-const Login: React.FC<LoginProps> = () => {
-  const [email, setEmail] = useState<string>('');
-  const [password, setPassword] = useState<string>('');
   const navigate = useNavigate();
+  const db = getFirestore();
 
+  // Check if the user is already logged in by checking for a token
   useEffect(() => {
-    const checkToken = () => {
-       const userToken = localStorage.getItem("token");
-       if (userToken){
-        navigate("/dashboard")
-       }
-       else {
-           console.log("User is not valid")
-           navigate("/")
-       }
+    const userToken = localStorage.getItem("token");
+    if (userToken) {
+      navigate("/dashboard"); // Redirect to dashboard if token exists
     }
-    checkToken()
-   }, [])
+  }, [navigate]);
 
-  const handleEmailChange = (e: ChangeEvent<HTMLInputElement>) => {
+  const handleEmailChange = (e: ChangeEvent<HTMLInputElement>) =>
     setEmail(e.target.value);
-  };
 
-  const handlePasswordChange = (e: ChangeEvent<HTMLInputElement>) => {
+  const handlePasswordChange = (e: ChangeEvent<HTMLInputElement>) =>
     setPassword(e.target.value);
-  };
 
   const handleLogin = async () => {
-    // console.log('Logging in with:', { email, password });
-    try {
-      const data:any = await signInWithEmailAndPassword(auth, email, password);
-      const userToken:string = await data?.user?.accessToken;
-      localStorage.setItem("token",userToken)
-      alert("Login Sucessful")
-      navigate("/dashboard")
+    setLoading(true);
+    setError("");
 
-  } catch (error:any) {
-      console.log("Error msg: ", error.message)
-      alert(error.message)
-  }
+    try {
+      const userData = await signInWithEmailAndPassword(auth, email, password);
+
+      const userDocRef = doc(db, "users", userData.user.uid);
+      const userDoc = await getDoc(userDocRef);
+
+      if (userDoc.exists()) {
+        const user = userDoc.data();
+        if (user) {
+          // If email is verified, store token and navigate to dashboard
+          const userToken = await userData.user.getIdToken();
+          localStorage.setItem("token", userToken);
+          navigate("/dashboard");
+        } else {
+          // If email is not verified, show alert
+          setError("Please verify your email before logging in.");
+        }
+      } else {
+        setError("User not found!");
+      }
+    } catch (err: any) {
+      setError("Invalid email or password.");
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
     <div className="container d-flex justify-content-center align-items-center vh-100">
-      <div className="card p-4">
+      <div className="card p-4" style={{ width: "400px" }}>
         <h3 className="card-title text-center mb-4">Login</h3>
+
+        {error && (
+          <div className="alert alert-danger" role="alert">
+            {error}
+          </div>
+        )}
+
         <form>
           <div className="mb-3">
-            <label htmlFor="username" className="form-label">
+            <label htmlFor="email" className="form-label">
               Email
             </label>
             <input
@@ -67,6 +81,8 @@ const Login: React.FC<LoginProps> = () => {
               id="email"
               value={email}
               onChange={handleEmailChange}
+              placeholder="Enter your email"
+              required
             />
           </div>
           <div className="mb-3">
@@ -79,15 +95,29 @@ const Login: React.FC<LoginProps> = () => {
               id="password"
               value={password}
               onChange={handlePasswordChange}
+              placeholder="Enter your password"
+              required
             />
           </div>
-          <div className="text-center">
-            <button type="button" className="btn btn-primary" onClick={handleLogin}>
-              Login
+
+          <div className="text-center mb-4">
+            <button
+              type="button"
+              className="btn btn-primary"
+              onClick={handleLogin}
+              disabled={loading}
+            >
+              {loading ? "Logging in..." : "Login"}
             </button>
           </div>
-          <h3 className='d-flex justify-content-center align-items-center'><a href="/register">Register</a></h3>
         </form>
+
+        {/* Center the register link */}
+        <div className="text-center mb-4">
+          <h3>
+            <a href="/register">Don't have an account? Register</a>
+          </h3>
+        </div>
       </div>
     </div>
   );
