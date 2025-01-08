@@ -42,14 +42,6 @@ const Register: React.FC = () => {
         );
 
         // Create a Firestore document for the user with isVerified as false
-        const userDocRef = doc(db, "users", userData.user.uid);
-        await setDoc(userDocRef, {
-          email: email,
-          username: "user", // Default username
-          lastLogin: "",
-          lastLogout: "",
-          isVerified: false, // Default isVerified is false
-        });
 
         // Sign out after successful registration
         await signOut(auth);
