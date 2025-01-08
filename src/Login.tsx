@@ -35,11 +35,10 @@ const Login: React.FC = () => {
     try {
       const userData = await signInWithEmailAndPassword(auth, email, password);
 
-      const userDocRef = doc(db, "users", userData.user.uid);
-      const userDoc = await getDoc(userDocRef);
+      //create a collection doc
 
-      if (userDoc.exists()) {
-        const user = userDoc.data();
+      if (exists()) {
+        //create docs
         if (user) {
           // If email is verified, store token and navigate to dashboard
           const userToken = await userData.user.getIdToken();

@@ -29,20 +29,8 @@ const Dashboard: React.FC = () => {
       setUser(authUser); // Set authenticated user
 
       // Check if the email is verified
-      setEmailVerified(authUser.emailVerified);
 
       // Fetch user data from Firestore when the user is authenticated
-      try {
-        const userData = await getUserData(authUser.uid);
-        if (userData) {
-          setUsername(userData.username || "user");
-        } else {
-          setUsername("user");
-        }
-      } catch (error) {
-        console.error("Error fetching user data:", error);
-        setUsername("user");
-      }
 
       setLoading(false);
     });
@@ -64,26 +52,11 @@ const Dashboard: React.FC = () => {
     setNewUsername(e.target.value);
   };
 
-  const handleProfileUpdate = async () => {
-    if (user && newUsername.trim() !== "") {
-      await updateUsername(user.uid, newUsername);
-      setUsername(newUsername);
-      setIsEditing(false);
-      setNewUsername("");
-    }
-  };
+  //Handle update profile
+  const handleProfileUpdate = async () => {};
 
-  const handleResendVerification = async () => {
-    if (user) {
-      try {
-        await sendEmailVerification(user); // Resend the verification email
-        alert("Verification email sent. Please check your inbox.");
-      } catch (error: any) {
-        console.error("Error sending verification email:", error.message);
-        alert("Error sending verification email.");
-      }
-    }
-  };
+  //handle Verification
+  const handleResendVerification = async () => {};
 
   return (
     <div className="container mt-5">
