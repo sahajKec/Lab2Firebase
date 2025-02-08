@@ -7,6 +7,7 @@ import {
 } from 'firebase/auth';
 import { auth } from './firebase';
 import { useNavigate } from 'react-router-dom';
+import { getFirestore, doc, setDoc, serverTimestamp } from 'firebase/firestore';
 
 interface RegisterProps {}
 
@@ -16,6 +17,7 @@ const Register: React.FC<RegisterProps> = () => {
   const [confirmPassword, setConfirmPassword] = useState<string>('');
   const [error, setError] = useState<string | null>(null);
   const navigate = useNavigate();
+  const db = getFirestore();
 
   const handleEmailChange = (e: ChangeEvent<HTMLInputElement>) => {
     setEmail(e.target.value);
@@ -44,22 +46,56 @@ const Register: React.FC<RegisterProps> = () => {
     validatePasswords();
   }, [password, confirmPassword]);
 
+  // const handleRegister = async () => {
+  //   try {
+  //     await createUserWithEmailAndPassword(auth, email, password).then(
+  //       (userData) => {
+  //         console.log(userData.user.uid);
+  //         if (userData.user.uid) {
+  //           sendEmailVerification(userData.user);
+  //           alert('Registration success');
+  //           signOut(auth);
+  //           navigate('/');
+  //         }
+  //       }
+  //     );
+  //   } catch (error: any) {
+  //     alert(error.message);
+  //     console.log(error.message);
+  //   }
+  // };
+
   const handleRegister = async () => {
     try {
-      await createUserWithEmailAndPassword(auth, email, password).then(
-        (userData) => {
-          console.log(userData.user.uid);
-          if (userData.user.uid) {
-            sendEmailVerification(userData.user);
-            alert('Registration success');
-            signOut(auth);
-            navigate('/');
-          }
-        }
+      const userCredential = await createUserWithEmailAndPassword(
+        auth,
+        email,
+        password
       );
+      const user = userCredential.user;
+
+      // Send verification email
+      await sendEmailVerification(user);
+
+      // Add user data to Firestore
+      const userDocRef = doc(db, 'users', user.uid);
+      await setDoc(userDocRef, {
+        uid: user.uid,
+        email: user.email,
+        name: 'user', // Default value
+        isLoggedIn: false, // Default value
+        lastLogin: serverTimestamp(), // Current timestamp
+      });
+
+      // Show success message and log the user out
+      alert(
+        'Registration successful! Please check your email to verify your account.'
+      );
+      await signOut(auth);
+      navigate('/');
     } catch (error: any) {
-      alert(error.message);
-      console.log(error.message);
+      setError(error.message);
+      console.error('Error during registration:', error.message);
     }
   };
 
