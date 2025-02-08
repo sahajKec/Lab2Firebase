@@ -4,6 +4,12 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 import { signInWithEmailAndPassword } from 'firebase/auth';
 import { auth } from './firebase';
 import { useNavigate } from 'react-router-dom';
+import {
+  doc,
+  updateDoc,
+  serverTimestamp,
+  getFirestore,
+} from 'firebase/firestore';
 
 interface LoginProps {}
 
@@ -11,6 +17,7 @@ const Login: React.FC<LoginProps> = () => {
   const [email, setEmail] = useState<string>('');
   const [password, setPassword] = useState<string>('');
   const navigate = useNavigate();
+  const db = getFirestore();
 
   useEffect(() => {
     const checkToken = () => {
@@ -38,6 +45,15 @@ const Login: React.FC<LoginProps> = () => {
       const data = await signInWithEmailAndPassword(auth, email, password);
       const userToken: string = await data?.user?.accessToken;
       localStorage.setItem('token', userToken);
+      const user = data.user;
+
+      // Update Firestore with the login time
+      const userDoc = doc(db, 'users', user.uid);
+      await updateDoc(userDoc, {
+        isLoggedIn: true,
+        lastLogin: serverTimestamp(),
+      });
+
       alert('Login Successful');
       navigate('/dashboard');
     } catch (error: any) {
