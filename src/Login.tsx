@@ -1,7 +1,6 @@
-//Doing this on lab
 import React, { useState, ChangeEvent, useEffect } from 'react';
 import 'bootstrap/dist/css/bootstrap.min.css';
-import { signInWithEmailAndPassword } from 'firebase/auth';
+import { signInWithEmailAndPassword, getIdToken } from 'firebase/auth';
 import { auth } from './firebase';
 import { useNavigate } from 'react-router-dom';
 import {
@@ -10,6 +9,7 @@ import {
   serverTimestamp,
   getFirestore,
 } from 'firebase/firestore';
+import './Styles.css';
 
 interface LoginProps {}
 
@@ -43,7 +43,8 @@ const Login: React.FC<LoginProps> = () => {
   const handleLogin = async () => {
     try {
       const data = await signInWithEmailAndPassword(auth, email, password);
-      const userToken: string = await data?.user?.accessToken;
+      // const userToken: string = await data?.user?.accessToken;
+      const userToken = await getIdToken(data.user);
       localStorage.setItem('token', userToken);
       const user = data.user;
 
