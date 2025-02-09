@@ -286,7 +286,7 @@ import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { auth, db } from './firebase';
 import { doc, getDoc, updateDoc } from 'firebase/firestore';
-import './Dashboard.css';
+import './Styles.css';
 
 const Dashboard = () => {
   const navigate = useNavigate();
