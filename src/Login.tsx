@@ -41,7 +41,6 @@ const Login: React.FC = () => {
       
         default:
           setAlert({ message: error.message, type: "error" });
-          
           break;
       }
     } finally {
