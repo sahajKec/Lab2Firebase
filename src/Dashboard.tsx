@@ -118,13 +118,13 @@ const Dashboard = () => {
                   <h3>Update Name</h3>
                   <input
                     type='text'
-                    className='form-control mb-2'
+                    className='form-control mb-2 mt-3'
                     value={newName}
                     onChange={(e) => setNewName(e.target.value)}
                     placeholder='Enter new name'
                   />
                   <button
-                    className='btn btn-primary'
+                    className='btn btn-primary mt-3'
                     onClick={handleNameUpdate}
                   >
                     Update Name
