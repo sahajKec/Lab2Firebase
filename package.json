@@ -1,5 +1,5 @@
 {
-  "name": "lab1",
+  "name": "lab",
   "private": true,
   "version": "0.0.0",
   "type": "module",
@@ -11,7 +11,7 @@
   },
   "dependencies": {
     "bootstrap": "^5.3.2",
-    "firebase": "^10.6.0",
+    "firebase": "^11.2.0",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "react-router-dom": "^6.20.0"
