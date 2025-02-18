@@ -1,93 +1,100 @@
-//Doing this on lab
-import React, { useState, ChangeEvent, useEffect } from 'react';
-import { auth } from './firebase';
-import {
-  signInWithEmailAndPassword,
-} from "firebase/auth";
-import 'bootstrap/dist/css/bootstrap.min.css';
-import { useNavigate } from 'react-router-dom';
+import { useState, useEffect, ChangeEvent } from "react";
+import { auth } from "./firebase";
+import { signInWithEmailAndPassword, UserCredential } from "firebase/auth";
+import { useNavigate, Link } from "react-router-dom";
 
-interface LoginProps {  }
-
-
-const Login: React.FC<LoginProps> = () => {
-  const [email, setEmail] = useState<string>('');
-  const [password, setPassword] = useState<string>('');
+const Login = () => {
+  const [email, setEmail] = useState<string>("");
+  const [password, setPassword] = useState<string>("");
+  const [message, setMessage] = useState<{ text: string; type: "success" | "error" | "" }>({ text: "", type: "" });
+  const [loading, setLoading] = useState<boolean>(false);
   const navigate = useNavigate();
 
   useEffect(() => {
-    const checkToken = () => {
-       const userToken = localStorage.getItem("token");
-       if (userToken){
-        navigate("/dashboard")
-       }
-       else {
-           console.log("User is not valid")
-           navigate("/")
-       }
+    const userToken = localStorage.getItem("token");
+    if (userToken) {
+      navigate("/dashboard");
     }
-    checkToken()
-   }, [])
-
-  const handleEmailChange = (e: ChangeEvent<HTMLInputElement>) => {
-    setEmail(e.target.value);
-  };
-
-  const handlePasswordChange = (e: ChangeEvent<HTMLInputElement>) => {
-    setPassword(e.target.value);
-  };
+  }, [navigate]);
 
   const handleLogin = async () => {
-    // console.log('Logging in with:', { email, password });
-    try {
-      const data:any = await signInWithEmailAndPassword(auth, email, password);
-      const userToken:string = await data?.user?.accessToken;
-      localStorage.setItem("token",userToken)
-      alert("Login Sucessful")
-      navigate("/dashboard")
+    setMessage({ text: "", type: "" });
+    setLoading(true);
 
-  } catch (error:any) {
-      console.log("Error msg: ", error.message)
-      alert(error.message)
-  }
+    try {
+      const data: UserCredential = await signInWithEmailAndPassword(auth, email, password);
+      const userToken: string = await data.user.getIdToken();
+
+      if (userToken) {
+        localStorage.setItem("token", userToken);
+        setMessage({ text: "Login Successful! Redirecting...", type: "success" });
+
+        setTimeout(() => navigate("/dashboard"), 1000);
+      }
+    } catch (error: unknown) {
+      if (error instanceof Error) {
+        setMessage({ text: error.message, type: "error" });
+      } else {
+        setMessage({ text: "An unexpected error occurred.", type: "error" });
+      }
+      setPassword("");
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
-    <div className="container d-flex justify-content-center align-items-center vh-100">
-      <div className="card p-4">
-        <h3 className="card-title text-center mb-4">Login</h3>
-        <form>
-          <div className="mb-3">
-            <label htmlFor="username" className="form-label">
-              Email
-            </label>
+    <div className="min-h-screen flex items-center justify-center bg-gray-900 p-6">
+      <div className="w-full max-w-md bg-gray-800 shadow-lg rounded-2xl p-8 flex flex-col gap-8 border border-gray-700 text-white">
+        
+        <h2 className="text-center text-3xl font-bold">Welcome Back</h2>
+
+        <form className="space-y-5">
+          {message.text && (
+            <p className={`text-center text-sm ${message.type === "success" ? "text-green-400" : "text-red-400"}`}>
+              {message.text}
+            </p>
+          )}
+
+          <div className="flex flex-col">
+            <label htmlFor="email" className="text-sm font-medium">Email Address</label>
             <input
-              type="email"
-              className="form-control"
               id="email"
+              type="email"
               value={email}
-              onChange={handleEmailChange}
+              onChange={(e: ChangeEvent<HTMLInputElement>) => setEmail(e.target.value)}
+              className="mt-1 w-full p-3 bg-gray-700 text-white border border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-400"
+              placeholder="Enter your email"
             />
           </div>
-          <div className="mb-3">
-            <label htmlFor="password" className="form-label">
-              Password
-            </label>
+
+          <div className="flex flex-col">
+            <label htmlFor="password" className="text-sm font-medium">Password</label>
             <input
-              type="password"
-              className="form-control"
               id="password"
+              type="password"
               value={password}
-              onChange={handlePasswordChange}
+              onChange={(e: ChangeEvent<HTMLInputElement>) => setPassword(e.target.value)}
+              className="mt-1 w-full p-3 bg-gray-700 text-white border border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-400"
+              placeholder="Enter your password"
             />
           </div>
-          <div className="text-center">
-            <button type="button" className="btn btn-primary" onClick={handleLogin}>
-              Login
-            </button>
-          </div>
-          <h3 className='d-flex justify-content-center align-items-center'><a href="/register">Register</a></h3>
+
+          <button
+            type="button"
+            onClick={handleLogin}
+            disabled={loading}
+            className={`w-full py-3 rounded-md text-white font-semibold transition ${loading ? "bg-gray-600 cursor-not-allowed" : "bg-blue-500 hover:bg-blue-600"}`}
+          >
+            {loading ? "Signing In..." : "Sign In"}
+          </button>
         </form>
+
+        <div className="text-center">
+          <Link to="/register" className="text-sm text-gray-400 hover:text-white">
+            Don't have an account? <span className="font-semibold">Register here.</span>
+          </Link>
+        </div>
       </div>
     </div>
   );
