@@ -1,15 +1,13 @@
 import { initializeApp } from "firebase/app";
 import { getAuth } from "firebase/auth";
-
-
-// const firebaseConfig: FirebaseConfig = {
-//   apiKey: "YOUR_API_KEY",
-//   authDomain: "YOUR_AUTH_DOMAIN",
-//   projectId: "YOUR_PROJECT_ID",
-//   storageBucket: "YOUR_STORAGE_BUCKET",
-//   messagingSenderId: "YOUR_MESSAGING_SENDER_ID",
-//   appId: "YOUR_APP_ID",
-//   measurementId: "YOUR_MES_ID",
-// };
+const firebaseConfig = {
+  apiKey: "AIzaSyA8GnhcsjMArD_lEpcqAqxjVOzp2i-Tw18",
+  authDomain: "lab2firebasebct2077.firebaseapp.com",
+  projectId: "lab2firebasebct2077",
+  storageBucket: "lab2firebasebct2077.firebasestorage.app",
+  messagingSenderId: "475061626743",
+  appId: "1:475061626743:web:80cb68c3dc20cfc1652372",
+  measurementId: "G-9HF2MT3GXJ",
+};
 const app = initializeApp(firebaseConfig);
 export const auth = getAuth(app);
