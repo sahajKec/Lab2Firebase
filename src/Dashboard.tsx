@@ -110,27 +110,27 @@ const Dashboard = () => {
     if (loading)
         return (
             <div className="flex justify-center items-center h-screen text-xl font-semibold text-gray-700">
-                <div className="animate-spin rounded-full h-24 w-24 border-t-4 border-blue-500 border-solid"></div>
+                <div className="animate-spin rounded-full h-24 w-24 border-t-4 border-gray-500 border-solid"></div>
             </div>
         );
 
     return (
-        <div className="min-h-screen bg-gray-50 text-gray-900">
-            <nav className="bg-white shadow p-4 flex justify-between items-center">
+        <div className="min-h-screen bg-white text-gray-900">
+            <nav className="bg-gray-900 shadow p-4 flex justify-between items-center text-white">
                 <h1 className="text-2xl font-bold">Portal</h1>
                 <button
                     onClick={handleLogout}
-                    className="bg-red-500 text-white px-4 py-2 rounded flex items-center gap-2 hover:bg-red-600 cursor-pointer transition"
+                    className="bg-red-900 text-white px-4 py-2 rounded flex items-center gap-2 hover:bg-red-700 cursor-pointer transition"
                 >
                     <FiLogOut /> Logout
                 </button>
             </nav>
 
             <div className="max-w-4xl mx-auto px-4 py-10">
-                <div className="bg-white shadow-md rounded-lg p-6">
+                <div className="bg-gray-100 shadow-md rounded-lg p-6">
                     {!isEmailVerified ? (
                         <div>
-                            <h2 className="text-orange-600 mb-2 text-lg font-semibold">
+                            <h2 className="text-gray-800 mb-2 text-lg font-semibold">
                                 Warning!
                             </h2>
                             <p className="text-gray-700 text-lg mb-4">
@@ -138,30 +138,30 @@ const Dashboard = () => {
                             </p>
                             <button
                                 onClick={handleResendVerification}
-                                className="bg-purple-800 text-white px-4 py-2 rounded hover:bg-purple-700 transition cursor-pointer"
+                                className="bg-gray-700 text-white px-4 py-2 rounded hover:bg-gray-600 transition cursor-pointer"
                             >
                                 Resend Verification Email
                             </button>
                         </div>
                     ) : (
-                        <div className="flex items-center gap-3">
-                            <h2 className="text-3xl font-semibold">
-                                Welcome, {user?.name}!
-                            </h2>
-                        </div>
+                        <h2 className="text-gray-800 text-3xl font-semibold">
+                            Welcome, {user?.name}!
+                        </h2>
                     )}
                 </div>
 
                 {isEmailVerified && (
-                    <div className="bg-white shadow-md rounded-lg p-6 mt-6">
-                        <h2 className="text-xl font-semibold mb-4">Actions</h2>
+                    <div className="bg-gray-100 shadow-md rounded-lg p-6 mt-6">
+                        <h2 className="text-xl font-semibold mb-4 text-gray-800">
+                            Actions
+                        </h2>
                         {!isEditing ? (
                             <button
                                 onClick={() => {
                                     setNewName(user?.name || "");
                                     setIsEditing(true);
                                 }}
-                                className="bg-purple-600 text-white px-4 py-2 rounded flex items-center gap-2 hover:bg-purple-500 transition cursor-pointer"
+                                className="bg-blue-900 text-white px-4 py-2 rounded flex items-center gap-2 hover:bg-blue-800 transition cursor-pointer"
                             >
                                 <FiEdit3 /> Update Name
                             </button>
@@ -171,12 +171,12 @@ const Dashboard = () => {
                                     type="text"
                                     value={newName}
                                     onChange={(e) => setNewName(e.target.value)}
-                                    className="px-4 py-2 border border-gray-300 rounded focus:ring-gray-400 transition focus:ring-2 focus:outline-none"
+                                    className="px-4 py-2 border border-gray-400 rounded focus:ring-gray-500 transition focus:ring-2 focus:outline-none"
                                     placeholder="Enter new name"
                                 />
                                 <button
                                     onClick={handleUpdateName}
-                                    className="bg-green-800 text-white px-4 py-2 rounded flex items-center gap-2 hover:bg-green-700 transition cursor-pointer"
+                                    className="bg-green-900 text-white px-4 py-2 rounded flex items-center gap-2 hover:bg-green-700 transition cursor-pointer"
                                     disabled={isUpdating}
                                 >
                                     {isUpdating ? (
@@ -189,7 +189,7 @@ const Dashboard = () => {
                                 </button>
                                 <button
                                     onClick={() => setIsEditing(false)}
-                                    className="bg-gray-500 text-white px-4 py-2 rounded flex items-center gap-2 hover:bg-gray-600 transition cursor-pointer"
+                                    className="bg-red-900 text-white px-4 py-2 rounded flex items-center gap-2 hover:bg-red-700 transition cursor-pointer"
                                 >
                                     <FiX /> Cancel
                                 </button>
