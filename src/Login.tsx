@@ -1,15 +1,14 @@
-//Doing this on lab
 import React, { useState, ChangeEvent, useEffect } from "react";
 import { auth } from "./firebase";
 import { signInWithEmailAndPassword } from "firebase/auth";
-import "bootstrap/dist/css/bootstrap.min.css";
+import "bootstrap/dist/css/bootstrap.min.css"; // ✅ Import Bootstrap
 import { useNavigate } from "react-router-dom";
+import { Alert } from "@mui/material";
 
-interface LoginProps {}
-
-const Login: React.FC<LoginProps> = () => {
+const Login: React.FC = () => {
   const [email, setEmail] = useState<string>("");
   const [password, setPassword] = useState<string>("");
+  const [success, setSuccess] = useState<boolean>(false);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -23,7 +22,7 @@ const Login: React.FC<LoginProps> = () => {
       }
     };
     checkToken();
-  }, []);
+  }, [navigate]);
 
   const handleEmailChange = (e: ChangeEvent<HTMLInputElement>) => {
     setEmail(e.target.value);
@@ -34,14 +33,15 @@ const Login: React.FC<LoginProps> = () => {
   };
 
   const handleLogin = async () => {
-    // console.log('Logging in with:', { email, password });
     try {
       const data: any = await signInWithEmailAndPassword(auth, email, password);
       console.log(data, "hello sagar what a sudden suprise");
       const userToken: string = await data?.user?.accessToken;
       localStorage.setItem("token", userToken);
-      alert("Login Sucessful");
-      navigate("/dashboard");
+      setSuccess(true);
+      setTimeout(() => {
+        navigate("/dashboard");
+      }, 2000);
     } catch (error: any) {
       console.log("Error msg: ", error.message);
       alert(error.message);
@@ -49,49 +49,62 @@ const Login: React.FC<LoginProps> = () => {
   };
 
   return (
-    <div className="container d-flex justify-content-center align-items-center vh-100">
-      <div className="card p-4">
-        <h3 className="card-title text-center mb-4">Login</h3>
-        <form>
-          <div className="mb-3">
-            <label htmlFor="username" className="form-label">
-              Email
-            </label>
-            <input
-              type="email"
-              className="form-control"
-              id="email"
-              value={email}
-              onChange={handleEmailChange}
-            />
-          </div>
-          <div className="mb-3">
-            <label htmlFor="password" className="form-label">
-              Password
-            </label>
-            <input
-              type="password"
-              className="form-control"
-              id="password"
-              value={password}
-              onChange={handlePasswordChange}
-            />
-          </div>
-          <div className="text-center">
-            <button
-              type="button"
-              className="btn btn-primary"
-              onClick={handleLogin}
-            >
-              Login
-            </button>
-          </div>
-          <h3 className="d-flex justify-content-center align-items-center">
-            <a href="/register">Register</a>
-          </h3>
-        </form>
+    <>
+      {success && (
+        <div className="position-fixed top-0 start-50 translate-middle-x mt-3 w-50">
+          <Alert severity="success" className="text-center">
+            Successfully Logged In.
+          </Alert>
+        </div>
+      )}
+
+      <div className="container d-flex justify-content-center align-items-center vh-100">
+        <div className="card p-4 shadow-lg" style={{ width: "350px" }}>
+          <h3 className="card-title text-center mb-4">Login</h3>
+          <form>
+            <div className="mb-3">
+              <label htmlFor="email" className="form-label">
+                Email
+              </label>
+              <input
+                type="email"
+                className="form-control"
+                id="email"
+                value={email}
+                onChange={handleEmailChange}
+              />
+            </div>
+            <div className="mb-3">
+              <label htmlFor="password" className="form-label">
+                Password
+              </label>
+              <input
+                type="password"
+                className="form-control"
+                id="password"
+                value={password}
+                onChange={handlePasswordChange}
+              />
+            </div>
+            <div className="text-center">
+              <button
+                type="button"
+                className="btn btn-primary w-100"
+                onClick={handleLogin}
+              >
+                Login
+              </button>
+            </div>
+            <p className="text-center mt-3">
+              Don't have an account?{" "}
+              <a href="/register" className="text-primary text-decoration-none">
+                Register
+              </a>
+            </p>
+          </form>
+        </div>
       </div>
-    </div>
+    </>
   );
 };
 
