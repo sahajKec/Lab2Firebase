@@ -1,6 +1,6 @@
 import React from 'react';
-import Register from './Register.tsx';
 import { HashRouter as Router, Routes, Route } from 'react-router-dom';
+import Register from './Register.tsx';
 import Login from './Login.tsx';
 import Dashboard from './Dashboard.tsx';
 
