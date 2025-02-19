@@ -18,13 +18,24 @@ import { auth } from "./firebase";
 
 const db = getFirestore();
 
+interface UserData {
+  uid: string;
+  email: string;
+  name: string;
+}
+
+interface Message {
+  type: "success" | "error";
+  text: string;
+}
+
 const Dashboard = () => {
-  const [user, setUser] = useState(null);
-  const [isEditing, setIsEditing] = useState(false);
-  const [newName, setNewName] = useState("");
-  const [loading, setLoading] = useState(true);
-  const [message, setMessage] = useState(null);
-  const [isEmailVerified, setIsEmailVerified] = useState(false);
+  const [user, setUser] = useState<UserData | null>(null);
+  const [isEditing, setIsEditing] = useState<boolean>(false);
+  const [newName, setNewName] = useState<string>("");
+  const [loading, setLoading] = useState<boolean>(true);
+  const [message, setMessage] = useState<Message | null>(null);
+  const [isEmailVerified, setIsEmailVerified] = useState<boolean>(false);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -34,9 +45,9 @@ const Dashboard = () => {
         try {
           const userDoc = await getDoc(doc(db, "users", currentUser.uid));
           if (userDoc.exists()) {
-            setUser(userDoc.data());
+            setUser(userDoc.data() as UserData);
           } else {
-            const newUser = {
+            const newUser: UserData = {
               uid: currentUser.uid,
               email: currentUser.email ?? "",
               name: "User",
@@ -58,7 +69,7 @@ const Dashboard = () => {
   const handleUpdateName = async () => {
     if (!user) return;
     try {
-      await updateProfile(auth.currentUser, { displayName: newName });
+      await updateProfile(auth.currentUser as User, { displayName: newName });
       await updateDoc(doc(db, "users", user.uid), { name: newName });
       setUser((prevUser) => (prevUser ? { ...prevUser, name: newName } : null));
       setIsEditing(false);
