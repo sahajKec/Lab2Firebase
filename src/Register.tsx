@@ -10,7 +10,7 @@ import { auth } from "./firebase";
 import { useNavigate } from "react-router-dom";
 import { getFirestore, doc, setDoc, serverTimestamp } from "firebase/firestore";
 import "./Register.css";
-
+import {Link} from "react-router-dom";
 const Register: React.FC = () => {
   const db = getFirestore();
   const [email, setEmail] = useState<string>("");
@@ -114,7 +114,7 @@ const Register: React.FC = () => {
             </div>
           </form>
           <p className="text-center">
-            Already have an account?<a href="/"> Login</a>
+            Already have an account?<Link to="/">Login</Link>
           </p>
         </div>
       </Box>
