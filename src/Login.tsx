@@ -1,93 +1,108 @@
-//Doing this on lab
-import React, { useState, ChangeEvent, useEffect } from 'react';
-import { auth } from './firebase';
-import {
-  signInWithEmailAndPassword,
-} from "firebase/auth";
-import 'bootstrap/dist/css/bootstrap.min.css';
-import { useNavigate } from 'react-router-dom';
+import { useState, useEffect, ChangeEvent, FormEvent } from "react";
+import { auth } from "./firebase";
+import { signInWithEmailAndPassword, UserCredential } from "firebase/auth";
+import { useNavigate, Link } from "react-router-dom";
 
-interface LoginProps {  }
+const Login = () => {
+  const [email, setEmail] = useState<string>("");
+  const [password, setPassword] = useState<string>("");
+  const [loading, setLoading] = useState<boolean>(false);
+  const [message, setMessage] = useState<{ text: string; type: "success" | "error" | "" }>({
+    text: "",
+    type: "",
+  });
 
-
-const Login: React.FC<LoginProps> = () => {
-  const [email, setEmail] = useState<string>('');
-  const [password, setPassword] = useState<string>('');
   const navigate = useNavigate();
 
   useEffect(() => {
-    const checkToken = () => {
-       const userToken = localStorage.getItem("token");
-       if (userToken){
-        navigate("/dashboard")
-       }
-       else {
-           console.log("User is not valid")
-           navigate("/")
-       }
+    const userToken = localStorage.getItem("token");
+    if (userToken) navigate("/dashboard");
+  }, [navigate]);
+
+  const handleLogin = async (e: FormEvent) => {
+    e.preventDefault();
+    setMessage({ text: "", type: "" });
+
+    if (!email || !password) {
+      setMessage({ text: "Please fill in all fields.", type: "error" });
+      return;
     }
-    checkToken()
-   }, [])
 
-  const handleEmailChange = (e: ChangeEvent<HTMLInputElement>) => {
-    setEmail(e.target.value);
-  };
-
-  const handlePasswordChange = (e: ChangeEvent<HTMLInputElement>) => {
-    setPassword(e.target.value);
-  };
-
-  const handleLogin = async () => {
-    // console.log('Logging in with:', { email, password });
+    setLoading(true);
     try {
-      const data:any = await signInWithEmailAndPassword(auth, email, password);
-      const userToken:string = await data?.user?.accessToken;
-      localStorage.setItem("token",userToken)
-      alert("Login Sucessful")
-      navigate("/dashboard")
+      const data: UserCredential = await signInWithEmailAndPassword(auth, email, password);
+      const userToken: string = await data.user.getIdToken();
+      localStorage.setItem("token", userToken);
 
-  } catch (error:any) {
-      console.log("Error msg: ", error.message)
-      alert(error.message)
-  }
+      setMessage({ text: "Login Successful! Redirecting...", type: "success" });
+      setTimeout(() => navigate("/dashboard"), 1000);
+    } catch (error: unknown) {
+      setMessage({ text: error instanceof Error ? error.message : "An unexpected error occurred.", type: "error" });
+      setPassword("");
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
-    <div className="container d-flex justify-content-center align-items-center vh-100">
-      <div className="card p-4">
-        <h3 className="card-title text-center mb-4">Login</h3>
-        <form>
-          <div className="mb-3">
-            <label htmlFor="username" className="form-label">
-              Email
+    <div className="min-h-screen flex items-center justify-center p-6 bg-gray-900">
+      <div className="w-full max-w-md bg-white shadow-lg rounded-xl p-8 flex flex-col gap-8">
+        <h2 className="text-center text-3xl font-bold text-gray-800">Sign In</h2>
+
+        <form className="space-y-5" onSubmit={handleLogin}>
+          <div>
+            <label htmlFor="email" className="block text-sm font-medium text-gray-700">
+              Email Address
             </label>
             <input
-              type="email"
-              className="form-control"
               id="email"
+              type="email"
               value={email}
-              onChange={handleEmailChange}
+              onChange={(e: ChangeEvent<HTMLInputElement>) => setEmail(e.target.value)}
+              className="mt-1 w-full p-3 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
+              placeholder="Enter your email"
+              required
             />
           </div>
-          <div className="mb-3">
-            <label htmlFor="password" className="form-label">
+          <div>
+            <label htmlFor="password" className="block text-sm font-medium text-gray-700">
               Password
             </label>
             <input
-              type="password"
-              className="form-control"
               id="password"
+              type="password"
               value={password}
-              onChange={handlePasswordChange}
+              onChange={(e: ChangeEvent<HTMLInputElement>) => setPassword(e.target.value)}
+              className="mt-1 w-full p-3 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
+              placeholder="Enter your password"
+              required
             />
           </div>
-          <div className="text-center">
-            <button type="button" className="btn btn-primary" onClick={handleLogin}>
-              Login
-            </button>
-          </div>
-          <h3 className='d-flex justify-content-center align-items-center'><a href="/register">Register</a></h3>
+
+          <button
+            type="submit"
+            disabled={loading}
+            className={`w-full py-3 text-white font-semibold rounded-md transition ${
+              loading
+                ? "bg-gray-400 cursor-not-allowed"
+                : "bg-gradient-to-r from-blue-500 to-purple-500 hover:opacity-75"
+            }`}
+          >
+            {loading ? "Signing In..." : "Sign In"}
+          </button>
+
+          {message.text && (
+            <p className={`text-center mt-3 text-md font-medium ${message.type === "success" ? "text-green-500" : "text-red-500"}`}>
+              {message.text}
+            </p>
+          )}
         </form>
+
+        <div className="text-center">
+          <Link to="/register" className="text-blue-600 hover:underline">
+            Don't have an account? <span className="font-semibold">Register here.</span>
+          </Link>
+        </div>
       </div>
     </div>
   );
