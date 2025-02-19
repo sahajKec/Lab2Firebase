@@ -1,33 +1,26 @@
-//Doing this on lab
-import React, { useState, ChangeEvent, useEffect } from 'react';
-import { auth } from './firebase';
-import {
-  signInWithEmailAndPassword,
-} from "firebase/auth";
-import 'bootstrap/dist/css/bootstrap.min.css';
-import { useNavigate } from 'react-router-dom';
+import React, { useState, ChangeEvent, useEffect } from "react";
+import { auth } from "./firebase";
+import { signInWithEmailAndPassword } from "firebase/auth";
+import "bootstrap/dist/css/bootstrap.min.css";
+import { useNavigate } from "react-router-dom";
+import { Alert, AlertTitle } from "@mui/material";
+import { Link } from "react-router-dom";
 
-interface LoginProps {  }
-
-
-const Login: React.FC<LoginProps> = () => {
-  const [email, setEmail] = useState<string>('');
-  const [password, setPassword] = useState<string>('');
+const Login: React.FC = () => {
+  const [email, setEmail] = useState<string>("");
+  const [password, setPassword] = useState<string>("");
+  const [success, setSuccess] = useState(false);
   const navigate = useNavigate();
 
   useEffect(() => {
     const checkToken = () => {
-       const userToken = localStorage.getItem("token");
-       if (userToken){
-        navigate("/dashboard")
-       }
-       else {
-           console.log("User is not valid")
-           navigate("/")
-       }
-    }
-    checkToken()
-   }, [])
+      const userToken = localStorage.getItem("token");
+      if (userToken) {
+        navigate("/dashboard");
+      }
+    };
+    checkToken();
+  }, []);
 
   const handleEmailChange = (e: ChangeEvent<HTMLInputElement>) => {
     setEmail(e.target.value);
@@ -36,31 +29,35 @@ const Login: React.FC<LoginProps> = () => {
   const handlePasswordChange = (e: ChangeEvent<HTMLInputElement>) => {
     setPassword(e.target.value);
   };
-
+  
   const handleLogin = async () => {
-    // console.log('Logging in with:', { email, password });
     try {
-      const data:any = await signInWithEmailAndPassword(auth, email, password);
-      const userToken:string = await data?.user?.accessToken;
-      localStorage.setItem("token",userToken)
-      alert("Login Sucessful")
-      navigate("/dashboard")
-
-  } catch (error:any) {
-      console.log("Error msg: ", error.message)
-      alert(error.message)
-  }
+      const data: any = await signInWithEmailAndPassword(auth, email, password);
+      const userToken: string = await data?.user?.accessToken;
+      localStorage.setItem("token", userToken);
+      setSuccess(true);
+      setTimeout(() => {
+        navigate("/dashboard");
+      }, 3000);
+    } catch (error: any) {
+      console.log("Error msg: ", error.message);
+      alert(error.message);
+    }
   };
 
   return (
     <div className="container d-flex justify-content-center align-items-center vh-100">
-      <div className="card p-4">
+      <div className="card p-4 shadow w-100" style={{ maxWidth: "400px" }}>
         <h3 className="card-title text-center mb-4">Login</h3>
+        {success && (
+          <Alert severity="success" className="mb-3">
+            <AlertTitle>Success</AlertTitle>
+            Login Successful.
+          </Alert>
+        )}
         <form>
           <div className="mb-3">
-            <label htmlFor="username" className="form-label">
-              Email
-            </label>
+            <label htmlFor="email" className="form-label">Email</label>
             <input
               type="email"
               className="form-control"
@@ -70,9 +67,7 @@ const Login: React.FC<LoginProps> = () => {
             />
           </div>
           <div className="mb-3">
-            <label htmlFor="password" className="form-label">
-              Password
-            </label>
+            <label htmlFor="password" className="form-label">Password</label>
             <input
               type="password"
               className="form-control"
@@ -82,11 +77,13 @@ const Login: React.FC<LoginProps> = () => {
             />
           </div>
           <div className="text-center">
-            <button type="button" className="btn btn-primary" onClick={handleLogin}>
+            <button type="button" className="btn btn-primary w-100" onClick={handleLogin}>
               Login
             </button>
           </div>
-          <h3 className='d-flex justify-content-center align-items-center'><a href="/register">Register</a></h3>
+          <p className="text-center mt-3">
+            <Link to="/register">Register</Link>
+          </p>
         </form>
       </div>
     </div>
