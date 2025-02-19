@@ -63,18 +63,20 @@ const Register = () => {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center p-6">
-      <div className="w-full max-w-md shadow-lg rounded-2xl p-8 flex flex-col gap-16 border border-white/30">
-        <h2 className="text-center text-4xl font-extrabold">Register</h2>
+    <div className="min-h-screen flex items-center justify-center p-6 bg-gradient-to-br from-gray-900 to-black">
+      <div className="w-full max-w-md bg-white/10 backdrop-blur-lg shadow-xl rounded-3xl p-10 flex flex-col gap-8 border border-white/20">
+        <h2 className="text-center text-3xl font-bold text-white">
+          Create an Account
+        </h2>
 
-        <form className="space-y-6 flex flex-col gap-3">
+        <form className="space-y-6 flex flex-col gap-4">
           {errorMessage && (
             <p className="text-center text-md font-medium text-red-400">
               {errorMessage}
             </p>
           )}
           <div>
-            <label htmlFor="email" className="block font-medium">
+            <label htmlFor="email" className="block text-white font-medium">
               Email Address
             </label>
             <input
@@ -84,12 +86,12 @@ const Register = () => {
               onChange={(e: ChangeEvent<HTMLInputElement>) =>
                 setEmail(e.target.value)
               }
-              className="mt-1 w-full p-3 border rounded-md focus:outline-none focus:ring-2 focus:ring-purple-400"
+              className="mt-1 w-full p-3 border rounded-xl bg-white/20 placeholder-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-400 text-white"
               placeholder="Enter your email"
             />
           </div>
           <div>
-            <label htmlFor="password" className="block font-medium">
+            <label htmlFor="password" className="block text-white font-medium">
               Password
             </label>
             <input
@@ -99,7 +101,7 @@ const Register = () => {
               onChange={(e: ChangeEvent<HTMLInputElement>) =>
                 setPassword(e.target.value)
               }
-              className="mt-1 w-full p-3 border rounded-md focus:outline-none focus:ring-2 focus:ring-purple-400"
+              className="mt-1 w-full p-3 border rounded-xl bg-white/20 placeholder-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-400 text-white"
               placeholder="Create a password"
             />
           </div>
@@ -107,7 +109,7 @@ const Register = () => {
           <button
             type="button"
             onClick={handleRegister}
-            className="w-full bg-gradient-to-r from-purple-500 to-green-500 hover:opacity-55 hover:text-black hover:cursor-pointer text-white font-semibold py-3 rounded-md transition border-[1px]"
+            className="w-full bg-gradient-to-r from-blue-500 to-purple-500 hover:opacity-80 text-white font-semibold py-3 rounded-xl transition shadow-lg"
           >
             Sign Up
           </button>
@@ -120,7 +122,7 @@ const Register = () => {
         </form>
 
         <div className="text-center">
-          <Link to="/" className="hover:underline">
+          <Link to="/" className="text-white hover:underline">
             Already have an account?{" "}
             <span className="font-semibold">Sign in here.</span>
           </Link>
