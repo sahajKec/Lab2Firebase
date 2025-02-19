@@ -15,7 +15,7 @@ import {
   onAuthStateChanged,
 } from "firebase/auth";
 import { auth } from "./firebase";
-import "bootstrap/dist/css/bootstrap.min.css";
+import "./Dashboard.css";
 const db = getFirestore();
 
 interface UserData {
@@ -109,66 +109,96 @@ const Dashboard = () => {
 
   if (loading)
     return (
-      <div className="d-flex justify-content-center align-items-center vh-100 text-primary fw-bold">
-        <div className="spinner-border text-primary" role="status">
-          <span className="visually-hidden">Loading...</span>
-        </div>
+      <div className="flex justify-center items-center h-screen text-xl font-semibold text-gray-600">
+        <div className="animate-spin rounded-full h-24 w-24 border-t-4 border-blue-500 border-solid"></div>
       </div>
     );
-
   return (
-    <div className="container mt-5">
-      <nav className="navbar navbar-light bg-light mb-4 p-3 rounded shadow">
-        <h1 className="navbar-brand fw-bold text-primary">Dashboard</h1>
-        <button onClick={handleLogout} className="btn btn-danger">Logout</button>
+    <div className="dashboard-container">
+      {/* Navigation */}
+      <nav className="navbar">
+        <h1 className="navbar-title">Dashboard</h1>
+        <button onClick={handleLogout} className="navbar-logout">
+          Logout
+        </button>
       </nav>
 
-      <div className="card shadow p-4 mb-4">
-        {!isEmailVerified ? (
-          <div className="alert alert-warning text-center">
-            <h4 className="alert-heading">Warning!</h4>
-            <p>You need to verify your email address.</p>
-            <button onClick={handleResendVerification} className="btn btn-warning mt-2">
-              Resend Verification Email
-            </button>
-          </div>
-        ) : (
-          <div className="text-center">
-            <h2 className="text-success">Hello, {user?.name}!</h2>
-            <p className="text-muted">Your email is verified.</p>
-          </div>
-        )}
-      </div>
-
-      {isEmailVerified && (
-        <div className="card shadow p-4">
-          <h2 className="fw-bold text-primary mb-3">Quick Actions</h2>
-          {message && (
-            <div className={`alert ${message.type === "success" ? "alert-success" : "alert-danger"}`}>
-              {message.text}
+      {/* Main Content */}
+      <div className="content-container">
+        {/* Email Verification */}
+        <div className="card verification-card">
+          {!isEmailVerified ? (
+            <div className="verification-message">
+              <h2 className="warning-text">Warning!</h2>
+              <p className="message-text">
+                You need to verify your email address.
+              </p>
+              <button onClick={handleResendVerification} className="btn-verify">
+                Resend Verification Email
+              </button>
             </div>
-          )}
-          {!isEditing ? (
-            <button onClick={() => { setNewName(user?.name || ""); setIsEditing(true); }} className="btn btn-primary w-100">
-              Update Name
-            </button>
           ) : (
-            <div className="d-flex flex-column gap-2">
-              <input
-                type="text"
-                value={newName}
-                onChange={(e) => setNewName(e.target.value)}
-                className="form-control border-primary"
-                placeholder="Enter new name"
-              />
-              <div className="d-flex gap-2">
-                <button onClick={handleUpdateName} className="btn btn-success flex-fill">Submit</button>
-                <button onClick={() => setIsEditing(false)} className="btn btn-secondary flex-fill">Cancel</button>
-              </div>
+            <div className="welcome-message">
+              <h2 className="welcome-text">Hello, {user?.name}!</h2>
+              <p className="email-verified-text">Your email is verified.</p>
             </div>
           )}
         </div>
-      )}
+
+        {/* Quick Actions */}
+        <div className="card quick-actions-card">
+          {isEmailVerified && (
+            <>
+              <h2 className="quick-actions-title">Quick Actions</h2>
+
+              {/* Message Display */}
+              {message && (
+                <div
+                  className={`message-box ${
+                    message.type === "success" ? "success" : "error"
+                  }`}
+                >
+                  {message.text}
+                </div>
+              )}
+
+              {/* Update Name Button */}
+              {!isEditing ? (
+                <button
+                  onClick={() => {
+                    setNewName(user?.name || "");
+                    setIsEditing(true);
+                  }}
+                  className="btn-update-name"
+                >
+                  Update Name
+                </button>
+              ) : (
+                <div className="name-update-form">
+                  <input
+                    type="text"
+                    value={newName}
+                    onChange={(e) => setNewName(e.target.value)}
+                    className="input-name"
+                    placeholder="Enter new name"
+                  />
+                  <div className="action-buttons">
+                    <button onClick={handleUpdateName} className="btn-submit">
+                      Submit
+                    </button>
+                    <button
+                      onClick={() => setIsEditing(false)}
+                      className="btn-cancel"
+                    >
+                      Cancel
+                    </button>
+                  </div>
+                </div>
+              )}
+            </>
+          )}
+        </div>
+      </div>
     </div>
   );
 };

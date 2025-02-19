@@ -1,19 +1,14 @@
 import React, { useState, ChangeEvent, useEffect } from "react";
-import { useNavigate, Link } from "react-router-dom";
 import { Alert, AlertTitle, Box } from "@mui/material";
 import "bootstrap/dist/css/bootstrap.min.css";
-import { 
-  createUserWithEmailAndPassword, 
-  sendEmailVerification, 
-  signOut, 
+import {
+  createUserWithEmailAndPassword,
+  sendEmailVerification,
+  signOut,
 } from "firebase/auth";
-import { 
-  getFirestore, 
-  doc, 
-  setDoc, 
-  serverTimestamp 
-} from "firebase/firestore";
 import { auth } from "./firebase";
+import { useNavigate, Link } from "react-router-dom";
+import { getFirestore, doc, setDoc, serverTimestamp } from "firebase/firestore";
 import "./Register.css";
 
 const Register: React.FC = () => {
@@ -40,14 +35,19 @@ const Register: React.FC = () => {
 
   const handleRegister = async () => {
     try {
-      const userData = await createUserWithEmailAndPassword(auth, email, password);
+      const userData = await createUserWithEmailAndPassword(
+        auth,
+        email,
+        password
+      );
       const user = userData.user;
 
       await sendEmailVerification(user);
 
+      // Set user data in Firestore
       await setDoc(doc(db, "users", user.uid), {
         uid: user.uid,
-        name: "User",
+        name: "user", // Explicitly set username to 'user'
         email,
         lastlogin: serverTimestamp(),
         isVerified: user.emailVerified,
@@ -80,7 +80,9 @@ const Register: React.FC = () => {
           <h3 className="card-title">Register</h3>
           <form>
             <div className="mb-3">
-              <label htmlFor="email" className="form-label">Email</label>
+              <label htmlFor="email" className="form-label">
+                Email
+              </label>
               <input
                 type="email"
                 className="form-control"
@@ -90,7 +92,9 @@ const Register: React.FC = () => {
               />
             </div>
             <div className="mb-3">
-              <label htmlFor="password" className="form-label">Password</label>
+              <label htmlFor="password" className="form-label">
+                Password
+              </label>
               <input
                 type="password"
                 className="form-control"
@@ -102,7 +106,7 @@ const Register: React.FC = () => {
             <div className="text-center">
               <button
                 type="button"
-                className="btn btn-primary"
+                className="btn-primary"
                 onClick={handleRegister}
               >
                 Register
@@ -110,7 +114,7 @@ const Register: React.FC = () => {
             </div>
           </form>
           <p className="text-center">
-            Already have an account? <Link to="/">Login</Link>
+            Already have an account?<Link to="/">Login</Link>
           </p>
         </div>
       </Box>
