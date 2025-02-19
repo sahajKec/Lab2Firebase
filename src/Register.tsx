@@ -18,10 +18,7 @@ const Register: React.FC<RegisterProps> = () => {
        if (userToken){
         navigate("/dashboard")
        }
-       else {
-           console.log("User is not valid")
-           navigate("/")
-       }
+      
     }
     checkToken()
    }, [])
