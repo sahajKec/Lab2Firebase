@@ -1,93 +1,118 @@
-//Doing this on lab
-import React, { useState, ChangeEvent, useEffect } from 'react';
-import { auth } from './firebase';
-import {
-  signInWithEmailAndPassword,
-} from "firebase/auth";
-import 'bootstrap/dist/css/bootstrap.min.css';
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { auth, db } from './firebase';
+import { signInWithEmailAndPassword } from "firebase/auth";
+import { doc, updateDoc, serverTimestamp } from "firebase/firestore";
 
-interface LoginProps {  }
+type MessageType = 'info' | 'error' | 'success';
 
-
-const Login: React.FC<LoginProps> = () => {
-  const [email, setEmail] = useState<string>('');
-  const [password, setPassword] = useState<string>('');
+const Login = () => {
+  const [formData, setFormData] = useState({ email: '', password: '' });
+  const [status, setStatus] = useState<{ message: string; type: MessageType }>({ 
+    message: '', 
+    type: 'info' 
+  });
+  const [isProcessing, setIsProcessing] = useState(false);
   const navigate = useNavigate();
 
   useEffect(() => {
-    const checkToken = () => {
-       const userToken = localStorage.getItem("token");
-       if (userToken){
-        navigate("/dashboard")
-       }
-       else {
-           console.log("User is not valid")
-           navigate("/")
-       }
-    }
-    checkToken()
-   }, [])
-
-  const handleEmailChange = (e: ChangeEvent<HTMLInputElement>) => {
-    setEmail(e.target.value);
-  };
-
-  const handlePasswordChange = (e: ChangeEvent<HTMLInputElement>) => {
-    setPassword(e.target.value);
-  };
+    if (localStorage.getItem("token")) navigate("/dashboard");
+  }, [navigate]);
 
   const handleLogin = async () => {
-    // console.log('Logging in with:', { email, password });
+    setIsProcessing(true);
     try {
-      const data:any = await signInWithEmailAndPassword(auth, email, password);
-      const userToken:string = await data?.user?.accessToken;
-      localStorage.setItem("token",userToken)
-      alert("Login Sucessful")
-      navigate("/dashboard")
+      const { user } = await signInWithEmailAndPassword(auth, formData.email, formData.password);
+      
+      if (!user.emailVerified) {
+        throw new Error("Please verify your email before logging in");
+      }
 
-  } catch (error:any) {
-      console.log("Error msg: ", error.message)
-      alert(error.message)
-  }
+      const token = await user.getIdToken();
+      localStorage.setItem("token", token);
+
+      await updateDoc(doc(db, 'users', user.uid), {
+        isVerified: true,
+        isLoggedIn: true,
+        lastLogin: serverTimestamp()
+      });
+
+      navigate('/dashboard');
+    } catch (error: any) {
+      setStatus({
+        message: error.code === 'auth/invalid-login-credentials' 
+          ? "Invalid email or password" 
+          : error.message,
+        type: 'error'
+      });
+    } finally {
+      setIsProcessing(false);
+    }
+  };
+
+  const getMessageStyle = (type: MessageType) => {
+    switch (type) {
+      case 'error':
+        return 'bg-red-100 text-red-700';
+      case 'success':
+        return 'bg-green-100 text-green-700';
+      default:
+        return 'bg-blue-100 text-blue-700';
+    }
   };
 
   return (
-    <div className="container d-flex justify-content-center align-items-center vh-100">
-      <div className="card p-4">
-        <h3 className="card-title text-center mb-4">Login</h3>
-        <form>
-          <div className="mb-3">
-            <label htmlFor="username" className="form-label">
-              Email
-            </label>
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-500 to-purple-600">
+      <div className="max-w-md w-full m-4 p-8 bg-white/95 backdrop-blur-sm rounded-2xl shadow-2xl">
+        {status.message && (
+          <div className={`p-4 rounded-lg mb-6 ${getMessageStyle(status.type)} animate-fadeIn`}>
+            {status.message}
+          </div>
+        )}
+        
+        <h2 className="text-3xl font-bold mb-8 text-center text-gray-800">Welcome Back</h2>
+        <div className="space-y-6">
+          <div>
+            <label className="text-sm font-medium text-gray-700 mb-1 block">Email</label>
             <input
               type="email"
-              className="form-control"
-              id="email"
-              value={email}
-              onChange={handleEmailChange}
+              placeholder="Enter your email"
+              className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
+              value={formData.email}
+              onChange={e => setFormData(prev => ({ ...prev, email: e.target.value }))}
             />
           </div>
-          <div className="mb-3">
-            <label htmlFor="password" className="form-label">
-              Password
-            </label>
+          <div>
+            <label className="text-sm font-medium text-gray-700 mb-1 block">Password</label>
             <input
               type="password"
-              className="form-control"
-              id="password"
-              value={password}
-              onChange={handlePasswordChange}
+              placeholder="Enter your password"
+              className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
+              value={formData.password}
+              onChange={e => setFormData(prev => ({ ...prev, password: e.target.value }))}
             />
           </div>
-          <div className="text-center">
-            <button type="button" className="btn btn-primary" onClick={handleLogin}>
-              Login
-            </button>
+          <button
+            onClick={handleLogin}
+            disabled={isProcessing}
+            className="w-full py-3 px-4 bg-gradient-to-r from-blue-600 to-blue-700 text-white rounded-lg hover:from-blue-700 hover:to-blue-800 transform hover:-translate-y-0.5 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
+          >
+            {isProcessing ? (
+              <span className="flex items-center justify-center">
+                <svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                  <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                  <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                </svg>
+                Logging in...
+              </span>
+            ) : 'Login'}
+          </button>
+          <div className="text-center mt-6">
+            <a href="/register" className="text-blue-600 hover:text-blue-800 font-medium transition-colors">
+              Need an account? Register here
+            </a>
           </div>
-          <h3 className='d-flex justify-content-center align-items-center'><a href="/register">Register</a></h3>
-        </form>
+        </div>
       </div>
     </div>
   );
