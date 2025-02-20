@@ -1,5 +1,5 @@
 //Make students do this
-import React, { useState, ChangeEvent, useEffect } from 'react';
+import React, { useState, ChangeEvent } from 'react';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import { createUserWithEmailAndPassword, sendEmailVerification, signOut } from "firebase/auth";
 import { auth } from './firebase';

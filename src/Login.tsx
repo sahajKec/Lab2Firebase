@@ -1,5 +1,5 @@
 //Doing this on lab
-import React, { useState, ChangeEvent, useEffect } from 'react';
+import React, { useState, ChangeEvent } from 'react';
 import { auth } from './firebase';
 import {
   signInWithEmailAndPassword,
