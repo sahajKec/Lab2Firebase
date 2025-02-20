@@ -1,5 +1,5 @@
 //Make students do this
-import React, { useState, ChangeEvent, useEffect } from 'react';
+import React, { useState, ChangeEvent } from 'react';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import { createUserWithEmailAndPassword, sendEmailVerification, signOut } from "firebase/auth";
 import { auth } from './firebase';
@@ -12,19 +12,19 @@ const Register: React.FC<RegisterProps> = () => {
     const [password, setPassword] = useState<string>('');
     const navigate = useNavigate()
 
-    useEffect(() => {
-    const checkToken = () => {
-       const userToken = localStorage.getItem("token");
-       if (userToken){
-        navigate("/dashboard")
-       }
-       else {
-           console.log("User is not valid")
-           navigate("/")
-       }
-    }
-    checkToken()
-   }, [])
+//     useEffect(() => {
+//     const checkToken = () => {
+//        const userToken = localStorage.getItem("token");
+//        if (userToken){
+//         navigate("/dashboard")
+//        }
+//        else {
+//            console.log("User is not valid")
+//            navigate("/")
+//        }
+//     }
+//     checkToken()
+//    }, [])
 
     const handleEmailChange = (e: ChangeEvent<HTMLInputElement>) => {
         setEmail(e.target.value);

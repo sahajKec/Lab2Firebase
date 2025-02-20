@@ -1,5 +1,5 @@
 //Doing this on lab
-import React, { useState, ChangeEvent, useEffect } from 'react';
+import React, { useState, ChangeEvent } from 'react';
 import { auth } from './firebase';
 import {
   signInWithEmailAndPassword,
@@ -15,19 +15,19 @@ const Login: React.FC<LoginProps> = () => {
   const [password, setPassword] = useState<string>('');
   const navigate = useNavigate();
 
-  useEffect(() => {
-    const checkToken = () => {
-       const userToken = localStorage.getItem("token");
-       if (userToken){
-        navigate("/dashboard")
-       }
-       else {
-           console.log("User is not valid")
-           navigate("/")
-       }
-    }
-    checkToken()
-   }, [])
+  // useEffect(() => {
+  //   const checkToken = () => {
+  //      const userToken = localStorage.getItem("token");
+  //      if (userToken){
+  //       navigate("/dashboard")
+  //      }
+  //      else {
+  //          console.log("User is not valid")
+  //          navigate("/")
+  //      }
+  //   }
+  //   checkToken()
+  //  }, [])
 
   const handleEmailChange = (e: ChangeEvent<HTMLInputElement>) => {
     setEmail(e.target.value);
